@@ -23,12 +23,12 @@ conn_string = os.getenv('AZURE_DATABASE_CONNECTION_STRING')
 
 # Create a database engine and connect to the database
 db = create_engine(conn_string)
-conn = db.connect() 
+
 for func in functions:
     function_name = func.__name__
     result_df = func()  # Call the function to get the DataFrame
-    result_df.to_sql(function_name, con=conn, if_exists='replace', index=False)
+    result_df.to_sql(function_name, con=db, if_exists='replace', index=False)
     print(f'Pushed data for {function_name}')
 
 # Close the database connection
-conn.close()
+db.dispose()
