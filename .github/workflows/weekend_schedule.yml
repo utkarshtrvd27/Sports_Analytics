@@ -1,0 +1,45 @@
+name: Sports Analytics ETL Pipeline
+
+on:
+  schedule:
+    # Run at 12:00 AM UTC every Saturday and Sunday
+    - cron: '0 0 * * 0,6'
+  workflow_dispatch:
+    # Allow manual triggering from GitHub UI
+
+jobs:
+  etl-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository content
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Setup Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      # Step 3: Install Python packages
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install python-dotenv
+
+      # Step 4: Execute ETL pipeline
+      - name: Execute ETL pipeline
+        env:
+          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+          AZURE_DATABASE_CONNECTION_STRING: ${{ secrets.AZURE_DATABASE_CONNECTION_STRING }}
+        run: python azure_main.py
+
+      # Step 5: Upload logs on failure (optional)
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: etl-logs
+          path: logs/
