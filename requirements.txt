@@ -2,9 +2,8 @@ azure-storage-blob==12.17.0
 beautifulsoup4==4.12.2
 numpy>=2.0.0
 pandas>=3.0.1
-psycopg2==2.9.7
+psycopg2==2.9.11
 pyarrow>=14.0.0
 Requests==2.31.0
 SQLAlchemy==2.0.20
-psycopg2==2.9.11
 python-dotenv==1.0.0
