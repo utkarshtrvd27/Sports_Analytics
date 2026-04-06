@@ -8,32 +8,20 @@ sys.path.insert(0, str(scrape_path))
 
 from scrape import *
 import pandas as pd
-from sqlalchemy import create_engine
-import psycopg2
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 
 # List the functions to process and push them to the database
-functions = [league_table,top_scorers]
+functions = [league_table, top_scorers]
 
 # Retrieve the database connection string from environment variables:
 conn_string = os.getenv('AZURE_DATABASE_CONNECTION_STRING')
 
-# Create a database engine
-db = create_engine(conn_string)
-
-# Use a connection from the engine
-with db.connect() as conn:
-    for func in functions:
-        function_name = func.__name__
-        result_df = func()  # Call the function to get the DataFrame
-        result_df.to_sql(function_name, con=conn, if_exists='replace', index=False)
-        print(f'Pushed data for {function_name}')
-    
-    # Commit the transaction
-    conn.commit()
-
-# Dispose of the engine
-db.dispose()
+# Pass the connection string directly to pandas (no connection object needed)
+for func in functions:
+    function_name = func.__name__
+    result_df = func()  # Call the function to get the DataFrame
+    result_df.to_sql(function_name, con=conn_string, if_exists='replace', index=False)
+    print(f'Pushed data for {function_name}')
